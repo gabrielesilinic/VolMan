@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VolMan.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+            <ScrollView
+                Orientation="Vertical"
+                MaximumHeightRequest="200"
+                MinimumHeightRequest="100"
+                VerticalScrollBarVisibility="Default"
+                >
+                <Editor x:Name="txtTranscribedText"
+                    Placeholder="Here will appear the Transcribed text"
+                    AutoSize="TextChanges"
+                    
+                    />
+            </ScrollView>
+            <ProgressBar x:Name="prgTranscriptionProgress"
+                         Progress="0"
+                         />
+            <Button x:Name="btnTranscribe"
+                    Text="Transcribe"
+                    Clicked="btnTranscribe_Clicked"
+                    />
+            <Button x:Name="btnFileSelector"
+                    Text="Select File"
+                    Clicked="btnFileSelector_Clicked"/>
+            <Button Text="Download Model"
+                    x:Name="btnModeldl"
+                    Clicked="btnModeldl_Clicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
