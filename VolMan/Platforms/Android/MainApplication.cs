@@ -1,5 +1,8 @@
 ﻿using Android.App;
 using Android.Runtime;
+using Android.Content;
+using Android.Content.PM;
+
 namespace VolMan;
 
 [Application]

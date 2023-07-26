@@ -3,15 +3,26 @@ using LibVLCSharp.Shared;
 using Microsoft.Maui.Storage;
 using CommunityToolkit.Maui.Alerts;
 using Whisper.net;
+using CommunityToolkit.Mvvm.Messaging;
+using System.Diagnostics;
 
 namespace VolMan;
-
+public record StartTranscription(string mediapath);
 public partial class MainPage : ContentPage
 {
     string currentFile = null;
     public MainPage()
     {
         InitializeComponent();
+        var messenger = WeakReferenceMessenger.Default;
+        messenger.Register<StartTranscription>(this, OnStartTranscription);
+    }
+    private void OnStartTranscription(object recipient, StartTranscription message)
+    {
+        //Note: this behaviour is a temporary implementation, later it will be replaced with a more robust one that supports queuing
+        //and actually starts the transcription process
+        this.currentFile = message.mediapath;
+        btnFileSelector.Text = "Selected: " + Path.GetFileName(message.mediapath);
     }
 
     private async void btnModeldl_Clicked(object sender, EventArgs e)
@@ -62,7 +73,6 @@ public partial class MainPage : ContentPage
 
     private async void btnTranscribe_Clicked(object sender, EventArgs e)
     {
-        string modelfile = Path.Combine(FileSystem.Current.AppDataDirectory, "ggml-base.bin");
         long mediaDuration = 0;
         if (this.currentFile == null)
         {
@@ -83,6 +93,7 @@ public partial class MainPage : ContentPage
         using (var mediaPlayer = new MediaPlayer(media))
         {
             mediaPlayer.Play();
+            Thread.Sleep(200);
             mediaDuration = mediaPlayer.Length;
             // Wait for the media to finish playing
             while (mediaPlayer.State != VLCState.Ended)
@@ -93,7 +104,7 @@ public partial class MainPage : ContentPage
         }
         prgTranscriptionProgress.Progress = 0;
         this.btnTranscribe.Text = "Loading Model...";
-        using var whisperFactory = WhisperFactory.FromPath(modelfile);
+        using var whisperFactory = WhisperFactory.FromBuffer(WhisperModelManager.Instance.GetPreferredModelBytes());
 
         using var processor = whisperFactory.CreateBuilder()
             .WithLanguage("auto")
@@ -106,12 +117,13 @@ public partial class MainPage : ContentPage
         {
             await foreach (var result in processor.ProcessAsync(fileStream))
             {
-                Console.WriteLine($"{result.Start}->{result.End}: {result.Text}");
+                //Console.WriteLine($"{result.Start}->{result.End}: {result.Text}");
                 txtTranscribedText.Text += result.Text;
                 if (result.End.TotalMilliseconds>0)
                 {
-                    prgTranscriptionProgress.Progress = result.End.TotalMilliseconds / mediaDuration;
+                    prgTranscriptionProgress.Progress = ((double)result.End.TotalMilliseconds) / ((double)mediaDuration);
                 }
+                Thread.Sleep(50);
             }
         }
         finally
@@ -121,5 +133,6 @@ public partial class MainPage : ContentPage
         }
         
     }
+
 }
 
