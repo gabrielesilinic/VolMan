@@ -23,6 +23,9 @@
             <ProgressBar x:Name="prgTranscriptionProgress"
                          Progress="0"
                          />
+            <Picker x:Name="pkModelPicker"
+                    Title="Select Model"
+                    />
             <Button x:Name="btnTranscribe"
                     Text="Transcribe"
                     Clicked="btnTranscribe_Clicked"

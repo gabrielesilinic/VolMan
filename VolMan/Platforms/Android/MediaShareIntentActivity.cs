@@ -28,7 +28,6 @@ public class MediaShareIntentActivity : MauiAppCompatActivity
         base.OnNewIntent(intent);
         if (intent != null)
         {
-            Toast.MakeText(this, Intent.Type, ToastLength.Short).Show();
 
             if (Android.Content.Intent.ActionSend.Equals(intent.Action) && intent.Type != null)
             {

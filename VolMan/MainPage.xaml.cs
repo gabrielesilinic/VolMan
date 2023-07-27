@@ -16,30 +16,26 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         var messenger = WeakReferenceMessenger.Default;
         messenger.Register<StartTranscription>(this, OnStartTranscription);
+        //make the model picker source the list of models from the model manager but make the model name the display text
+        // Set the ItemsSource of the pkModelPicker to the whisperModels
+        this.pkModelPicker.ItemsSource = WhisperModelManager.Instance.whisperModels;
+        // Set the DisplayMemberPath to the Name property of the WhisperModel
+        this.pkModelPicker.ItemDisplayBinding = new Binding("Name");
+        this.pkModelPicker.SelectedIndex = WhisperModelManager.Instance.whisperModels.ToList().FindIndex(x => x.Name == Preferences.Get("preferredModel", WhisperModelManager.Instance.ModelBase.Name));
+        this.pkModelPicker.SelectedIndexChanged += PkModelPicker_SelectedIndexChanged;
     }
+
+    private void PkModelPicker_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        WhisperModelManager.Instance.setPreferredModel((WhisperModel)this.pkModelPicker.SelectedItem);
+    }
+
     private void OnStartTranscription(object recipient, StartTranscription message)
     {
         //Note: this behaviour is a temporary implementation, later it will be replaced with a more robust one that supports queuing
         //and actually starts the transcription process
         this.currentFile = message.mediapath;
         btnFileSelector.Text = "Selected: " + Path.GetFileName(message.mediapath);
-    }
-
-    private async void btnModeldl_Clicked(object sender, EventArgs e)
-    {
-        var btn = (Button)sender;
-        Environment.CurrentDirectory = FileSystem.Current.AppDataDirectory;
-        var modelName = "ggml-base.bin";
-        if (!File.Exists(modelName))
-        {
-            btn.Text = "Downloading...";
-            using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.Base);
-            using var fileWriter = File.OpenWrite(modelName);
-            await modelStream.CopyToAsync(fileWriter);
-        }
-        btn.Text = "The model was downloaded";
-        btn.IsEnabled = false;
-        Console.WriteLine(Environment.CurrentDirectory);
     }
 
     private async void btnFileSelector_Clicked(object sender, EventArgs e)

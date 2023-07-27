@@ -43,6 +43,15 @@ namespace VolMan
         {
             return Models[Preferences.Get("preferredModel", this.ModelBase.Name)].GetBytes();
         }
+        public void setPreferredModel(WhisperModel model)
+        {
+            //if preferred model does not exist add it to the dictionary
+            if (!Models.ContainsKey(model.Name))
+            {
+                Models.Add(model.Name, model);
+            }
+            Preferences.Set("preferredModel", model.Name);
+        }
     }
     public class WhisperModel
     {
@@ -63,6 +72,7 @@ namespace VolMan
                  * PLEASE keep the code like this or android will blow in your face,
                  * seems like the stream length is not properly supported by android
                  * for this reason Read and ReadAsync will make the app crash.
+                 * https://github.com/dotnet/maui/issues/7471
                  */
                 var modeltask = FileSystem.OpenAppPackageFileAsync(this.Path);//await is the worst thing that ever happened to dotnet MAUI
                 modeltask.Wait();
