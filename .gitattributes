@@ -49,3 +49,4 @@
 Resources/Raw/models/ggml-base.bin filter=lfs diff=lfs merge=lfs -text
 Resources/Raw/models/ggml-small.bin filter=lfs diff=lfs merge=lfs -text
 Resources/Raw/models/ggml-tiny.bin filter=lfs diff=lfs merge=lfs -text
+VolMan/Resources/Raw/models/*.bin filter=lfs diff=lfs merge=lfs -text
