@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Alerts;
 using Whisper.net;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics;
+using System.Windows.Input;
 
 namespace VolMan;
 public record StartTranscription(string mediapath);
@@ -129,6 +130,16 @@ public partial class MainPage : ContentPage
         }
         
     }
+    public ICommand OpenGithubUrl => new Command(async () =>
+    {
+        string url = "https://github.com";
+        await Launcher.OpenAsync(new Uri(url));
+    });
 
+    private async void tbiGithub_Clicked(object sender, EventArgs e)
+    {
+        Uri uri = new("https://github.com/gabrielesilinic/VolMan/");
+        await Browser.Default.OpenAsync(uri, BrowserLaunchMode.SystemPreferred);
+    }
 }
 
