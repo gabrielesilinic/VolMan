@@ -30,9 +30,6 @@
             <Button x:Name="btnFileSelector"
                     Text="Select File"
                     Clicked="btnFileSelector_Clicked"/>
-            <Button Text="Download Model"
-                    x:Name="btnModeldl"
-                    Clicked="btnModeldl_Clicked"/>
         </VerticalStackLayout>
     </ScrollView>
 

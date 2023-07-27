@@ -55,12 +55,21 @@ namespace VolMan
             Name = name;
             IsEmbedded = isEmbedded;
         }
-        /*public async Task<byte[]> GetBytesAsync()
+        public async Task<byte[]> GetBytesAsync()
         {
             if (IsEmbedded)
             {
-                
-
+                /*
+                 * PLEASE keep the code like this or android will blow in your face,
+                 * seems like the stream length is not properly supported by android
+                 * for this reason Read and ReadAsync will make the app crash.
+                 */
+                var modeltask = FileSystem.OpenAppPackageFileAsync(this.Path);//await is the worst thing that ever happened to dotnet MAUI
+                modeltask.Wait();
+                using var stream = modeltask.Result;
+                using var memoryStream = new MemoryStream();
+                stream.CopyToAsync(memoryStream).Wait();//not await becase behaves weirdly:
+                return memoryStream.ToArray();          //gets stuck and by using .ConfigureAwait(false) changes thread and makes extra mess
             }
             else
             {
@@ -74,17 +83,12 @@ namespace VolMan
                     throw new FileNotFoundException("File not found", this.Path);
                 }
             }
-        }*/
+        }
         public byte[] GetBytes()
         {
-            byte[] buff;
-            Stream stream;
-            var streamtask = FileSystem.OpenAppPackageFileAsync(this.Path);
-            streamtask.Wait();
-            stream = streamtask.Result;
-            buff = new byte[stream.Length];
-            stream.Read(buff, 0, (int)stream.Length);
-            return buff;
+            var task = GetBytesAsync();
+            task.Wait();
+            return task.Result;
         }
     }
 }
